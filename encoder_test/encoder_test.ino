@@ -32,9 +32,9 @@ void loop() {
   digitalWrite(motor_fwd_pin, LOW);
   digitalWrite(motor_bck_pin, HIGH);
 
-  int interval;
+  long interval;
   if((interval = millis() - last_read) >= 25){
-    unsigned long delta = encoder.getCount() - last_count;
+    long delta = encoder.getCount() - last_count;
     long velo = delta * 1000 / interval / 64;
     printf("VELO = %d\n", velo);
     last_count = encoder.getCount();

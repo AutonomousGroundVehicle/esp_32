@@ -1,4 +1,6 @@
+#include <ESP32Encoder.h>
 #include <ESP32Servo.h>
+#include <PID_v1.h>
 
 #define DEBUG 0
 
@@ -14,8 +16,22 @@ int servo_right_pin = 22;
 int motor_enable_pin = 21;
 int motor_fwd_pin = 19;
 int motor_bck_pin = 18;
+int encoder_a_pin = 26;
+int encoder_b_pin = 25;
 
 Servo left_steer, right_steer;
+
+unsigned long last_read;
+unsigned long last_count;
+ESP32Encoder encoder;
+
+double Kp = 5;
+double Ki = 5;
+double Kd = 0;
+double motor_encoder = 0;
+double motor_pwm = 0;
+double motor_set = 0;
+PID motor_pid(&motor_encoder, &motor_pwm, &motor_set, Kp, Ki, Kd, DIRECT);
 
 void setup() {
   #if DEBUG
@@ -32,6 +48,14 @@ void setup() {
   left_steer.writeMicroseconds(1500);
   right_steer.writeMicroseconds(1500);
   analogWrite(motor_enable_pin, 0);
+
+  pinMode(encoder_a_pin, INPUT);
+  pinMode(encoder_b_pin, INPUT);
+  encoder.attachFullQuad(encoder_a_pin, encoder_b_pin);
+
+  /* PID Setup */
+  motor_pid.SetMode(AUTOMATIC);
+  
 }
 
 void loop() {
@@ -89,8 +113,9 @@ void loop() {
     right_steer.writeMicroseconds(pwm_right);
 
     /* MOTOR*/
-    int speed = round(abs(velocity) * 255);
-    analogWrite(motor_enable_pin, speed);
+    /*int speed = round(abs(velocity) * 255);
+    analogWrite(motor_enable_pin, speed);*/
+    motor_set = abs(velocity) * 140;  // 145 is from measured maximum rps
     
     if(velocity > 0){
       digitalWrite(motor_fwd_pin, HIGH);
@@ -110,4 +135,21 @@ void loop() {
     printf("ANGLE_L = %f\nANGLE_R = %f\n\n", angle_left, angle_right);
     #endif
   }
+
+  /* Encoder & PID */
+  long interval;
+  long velo;
+  if((interval = millis() - last_read) >= 25){
+    long delta = encoder.getCount() - last_count;
+    velo = delta * 1000 / interval / 64;
+    #if DEBUG
+    printf("VELO = %d\n", velo);
+    #endif
+    last_count = encoder.getCount();
+    last_read = millis();
+  }
+
+  motor_encoder = (double)abs(velo);
+  motor_pid.Compute();
+  analogWrite(motor_enable_pin, motor_pwm);
 }

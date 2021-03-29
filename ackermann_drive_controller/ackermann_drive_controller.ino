@@ -84,7 +84,7 @@ void loop() {
 
     /* Steering Servo Control */
     int pwm_left = round(2000 * angle_left / PI + 500);
-    int pwm_right = round(2000 * angle_left / PI + 500);
+    int pwm_right = round(2000 * angle_right / PI + 500);
     left_steer.writeMicroseconds(pwm_left);
     right_steer.writeMicroseconds(pwm_right);
 

@@ -34,7 +34,7 @@ double motor_set = 0;
 PID motor_pid(&motor_encoder, &motor_pwm, &motor_set, Kp, Ki, Kd, DIRECT);
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial2.begin(9600);
   
   left_steer.attach(servo_left_pin);
@@ -113,7 +113,7 @@ void loop() {
     /* MOTOR*/
     /*int speed = round(abs(velocity) * 255);
     analogWrite(motor_enable_pin, speed);*/
-    motor_set = abs(velocity) * 140;  // 145 is from measured maximum rps
+    motor_set = abs(velocity) * 120;  // 145 is from measured maximum rps
     
     if(velocity > 0){
       digitalWrite(motor_fwd_pin, HIGH);
@@ -143,12 +143,13 @@ void loop() {
     #if DEBUG
     printf("VELO = %d\n", velo);
     #endif
+    Serial.print(velo);
+    Serial.print(" ");
+    Serial.println(motor_set);
     last_count = encoder.getCount();
     last_read = millis();
   }
-
   motor_encoder = (double)abs(velo);
-  Serial.print(motor_encoder);
   motor_pid.Compute();
   analogWrite(motor_enable_pin, motor_pwm);
 }

@@ -26,7 +26,7 @@ unsigned long last_count;
 ESP32Encoder encoder;
 
 double Kp = 5;
-double Ki = 5;
+double Ki = 0;
 double Kd = 0;
 double motor_encoder = 0;
 double motor_pwm = 0;
@@ -34,9 +34,7 @@ double motor_set = 0;
 PID motor_pid(&motor_encoder, &motor_pwm, &motor_set, Kp, Ki, Kd, DIRECT);
 
 void setup() {
-  #if DEBUG
   Serial.begin(9600);
-  #endif
   Serial2.begin(9600);
   
   left_steer.attach(servo_left_pin);
@@ -150,6 +148,7 @@ void loop() {
   }
 
   motor_encoder = (double)abs(velo);
+  Serial.print(motor_encoder);
   motor_pid.Compute();
   analogWrite(motor_enable_pin, motor_pwm);
 }

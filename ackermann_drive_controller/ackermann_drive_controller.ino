@@ -25,7 +25,7 @@ unsigned long last_read;
 unsigned long last_count;
 ESP32Encoder encoder;
 
-double Kp = 5;
+double Kp = 30;
 double Ki = 0;
 double Kd = 0;
 double motor_encoder = 0;
@@ -79,6 +79,20 @@ void loop() {
     u.b[3] = drive_msg[4];
     velocity = u.f;
 
+    /* CLIPPING */
+    if(turn > 1){
+      turn = 1;
+    }
+    else if (turn < -1){
+      turn = -1;
+    }
+    if(velocity > 1){
+      velocity = 1;
+    } 
+    else if (velocity < -1){
+      velocity = -1;
+    }
+
     /* STEERING */
     float theta, turn_radius, theta_in, theta_out, angle_left, angle_right;
 
@@ -106,7 +120,7 @@ void loop() {
 
     /* Steering Servo Control */
     int pwm_left = round(2000 * angle_left / PI + 500);
-    int pwm_right = round(2000 * angle_left / PI + 500);
+    int pwm_right = round(2000 * angle_right / PI + 500);
     left_steer.writeMicroseconds(pwm_left);
     right_steer.writeMicroseconds(pwm_right);
 
@@ -137,15 +151,15 @@ void loop() {
   /* Encoder & PID */
   long interval;
   long velo;
-  if((interval = millis() - last_read) >= 25){
+  if((interval = millis() - last_read) >= 20){
     long delta = encoder.getCount() - last_count;
     velo = delta * 1000 / interval / 64;
     #if DEBUG
     printf("VELO = %d\n", velo);
     #endif
-    Serial.print(velo);
-    Serial.print(" ");
-    Serial.println(motor_set);
+//    Serial.print(velo);
+//    Serial.print(" ");
+//    Serial.println(motor_set);
     last_count = encoder.getCount();
     last_read = millis();
   }

@@ -25,8 +25,8 @@ unsigned long last_read;
 unsigned long last_count;
 ESP32Encoder encoder;
 
-double Kp = 30;
-double Ki = 0;
+double Kp = 0;
+double Ki = 10;
 double Kd = 0;
 double motor_encoder = 0;
 double motor_pwm = 0;
@@ -151,19 +151,25 @@ void loop() {
   /* Encoder & PID */
   long interval;
   long velo;
-  if((interval = millis() - last_read) >= 20){
+  long time_now = millis();
+  if((interval = time_now - last_read) >= 10){
+    long cur_count = encoder.getCount();
     long delta = encoder.getCount() - last_count;
     velo = delta * 1000 / interval / 64;
     #if DEBUG
     printf("VELO = %d\n", velo);
     #endif
-//    Serial.print(velo);
+    Serial.print(velo);
+    Serial.print(" ");
+    Serial.println(motor_set);
+    last_count = cur_count;
+    last_read = time_now;
+
+    motor_encoder = (double)abs(velo);
+    motor_pid.Compute();
+    analogWrite(motor_enable_pin, motor_pwm);
+//    Serial.print(motor_set);
 //    Serial.print(" ");
-//    Serial.println(motor_set);
-    last_count = encoder.getCount();
-    last_read = millis();
+//    Serial.println(motor_pwm);
   }
-  motor_encoder = (double)abs(velo);
-  motor_pid.Compute();
-  analogWrite(motor_enable_pin, motor_pwm);
 }

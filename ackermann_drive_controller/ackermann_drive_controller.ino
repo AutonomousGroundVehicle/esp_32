@@ -25,9 +25,9 @@ unsigned long last_read;
 unsigned long last_count;
 ESP32Encoder encoder;
 
-double Kp = 0;
-double Ki = 10;
-double Kd = 0;
+double Kp = 4;
+double Ki = 7;
+double Kd = 0.4;
 double motor_encoder = 0;
 double motor_pwm = 0;
 double motor_set = 0;
@@ -138,8 +138,8 @@ void loop() {
       digitalWrite(motor_bck_pin, HIGH);
     }
     else {
-      digitalWrite(motor_fwd_pin, LOW);
-      digitalWrite(motor_bck_pin, LOW);
+      digitalWrite(motor_fwd_pin, HIGH);
+      digitalWrite(motor_bck_pin, HIGH);
     }
 
     #if DEBUG
@@ -167,7 +167,13 @@ void loop() {
 
     motor_encoder = (double)abs(velo);
     motor_pid.Compute();
-    analogWrite(motor_enable_pin, motor_pwm);
+    if(motor_pwm == 0){
+      analogWrite(motor_enable_pin, 255);
+    }
+    else{
+      analogWrite(motor_enable_pin, motor_pwm);
+    }
+    
 //    Serial.print(motor_set);
 //    Serial.print(" ");
 //    Serial.println(motor_pwm);

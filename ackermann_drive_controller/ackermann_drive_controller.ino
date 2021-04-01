@@ -34,7 +34,9 @@ double motor_set = 0;
 PID motor_pid(&motor_encoder, &motor_pwm, &motor_set, Kp, Ki, Kd, DIRECT);
 
 void setup() {
+  #if DEBUG
   Serial.begin(115200);
+  #endif
   Serial2.begin(9600);
   
   left_steer.attach(servo_left_pin);
@@ -125,9 +127,7 @@ void loop() {
     right_steer.writeMicroseconds(pwm_right);
 
     /* MOTOR*/
-    /*int speed = round(abs(velocity) * 255);
-    analogWrite(motor_enable_pin, speed);*/
-    motor_set = abs(velocity) * 120;  // 145 is from measured maximum rps
+    motor_set = abs(velocity) * 120;  // 120 is from experimental maximum rps
     
     if(velocity > 0){
       digitalWrite(motor_fwd_pin, HIGH);
@@ -156,12 +156,11 @@ void loop() {
     long cur_count = encoder.getCount();
     long delta = encoder.getCount() - last_count;
     velo = delta * 1000 / interval / 64;
-    #if DEBUG
-    printf("VELO = %d\n", velo);
-    #endif
+    #if DEBUG    
     Serial.print(velo);
     Serial.print(" ");
     Serial.println(motor_set);
+    #endif
     last_count = cur_count;
     last_read = time_now;
 
@@ -173,9 +172,5 @@ void loop() {
     else{
       analogWrite(motor_enable_pin, motor_pwm);
     }
-    
-//    Serial.print(motor_set);
-//    Serial.print(" ");
-//    Serial.println(motor_pwm);
   }
 }

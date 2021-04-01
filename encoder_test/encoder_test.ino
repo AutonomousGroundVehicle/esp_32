@@ -28,7 +28,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  analogWrite(motor_enable_pin, 180);
+  analogWrite(motor_enable_pin, 255);
   digitalWrite(motor_fwd_pin, LOW);
   digitalWrite(motor_bck_pin, HIGH);
 

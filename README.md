@@ -12,8 +12,8 @@ ESP32 Motor Controller &amp; Sensor Data Acquisition
 |        |**GPIO35**|**GPIO21**|motor pwm|
 |        |**GPIO32**|**GND**   |        |
 |        |**GPIO33**|**GPIO19**|motor fwd|
-|        |**GPIO25**|**GPIO18**|motor bck|
-|        |**GPIO26**|**GPIO5** |        |
+|Encoder B|**GPIO25**|**GPIO18**|motor bck|
+|Encoder A|**GPIO26**|**GPIO5** |        |
 |        |**GPIO27**|**GPIO17**|        |
 |        |**GPIO14**|**GPIO16**|        |
 |        |**GPIO12**|**GPIO4** |        |
@@ -22,4 +22,4 @@ ESP32 Motor Controller &amp; Sensor Data Acquisition
 |        |**GPIO9** |**GPIO15**|        |
 |        |**GPIO10**|**GPIO8** |        |
 |        |**GPIO11**|**GPIO7** |        |
-|        |**VIN**   |**GPIO6** |        |
+|5V      |**VIN**   |**GPIO6** |        |
